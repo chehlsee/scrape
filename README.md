@@ -31,3 +31,6 @@ Finally, run this command in your Terminal/Bash window:
 	heroku addons: create mongolab
 	
 Now, open the application using URL: `https:git.heroku.com/chehlseevice.git  `.
+
+# Copyright
+ (C) Chehlsee 2018. All Rights Reserved.
