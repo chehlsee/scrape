@@ -1,0 +1,59 @@
+{{!-- used from in class assignment 20-scrape-with-mongoose --}}
+<div class="jumbotron text-center">
+  <div class="overlay"><!--adds the darker overlay to the jumbotron-->
+  </div>
+  <div class="background-image">
+  </div>
+  <div class="caption">
+    <h1>Chehlsee Vice Scrapper</h1>
+    <p>Catch up on World News the easy way</p>
+  </div>
+</div>
+
+{{!-- handlebars assignment as reference 17-catsApp --}}
+{{!-- card container from bootstrap --}}
+<div class="container-fluid articles-container">
+  {{#each article}}
+  <div class="card">
+    <div class= "card-header">
+      {{!-- article title used in an a-tag to the articles page --}}
+      {{!-- all info needed on card can be found in article.js --}}
+      <a class="link" href="{{link}}">
+        <h3>{{subtext}}</h3>
+      </a>
+      {{!-- button from bootstrap to save the article to the db --}}
+      <a class="btn btn-success save">Save Article for Later</a>
+    </div>
+    {{!-- unless is a handlebars helper --}}
+    <div class="card-body">
+      <h4>{{title}}</h4>
+      <p>{{desc}}</p>
+      {{#unless article}}
+      <h1>No article present</h1>
+      {{/unless}}
+    </div>
+  </div>
+  {{/each}}
+</div>
+
+{{!-- index.handlebars bootstrap for leaving a note --}}
+<form method="post" action="http://">
+<textarea name="comments" cols="30" rows="5" class="html-text-box">Comments here...</textarea><br>
+<input type="save" value="Save" class="html-text-box">
+<input type="reset" value="Reset" class="html-text-box"></form>
+
+<script type="text/javascript">
+$(".save").on("click",() => {
+  // save the info onto the card
+  var saved = $(this)
+  .parents(".card")
+  .data()
+})
+
+</script>
+
+<footer class ="footer">
+  <div class="footer-container">
+    <p>Chehlsee</p>
+  </div>
+</footer>
