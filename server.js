@@ -32,19 +32,27 @@ app.use(express.json());
 // Make public a static folder
 app.use(express.static("public"));
 
+// app.get("/",function(req, res){
+//   res.send("z");
+// })
+
 // Connect to the Mongo DB
 // this section is not working in terminal reading error
 mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/mongoHeadlines", { useNewUrlParser: true });
+
 // connect heroku chehlseevice
 mongoose.Promise = Promise;
 
 // Establish handlebars and use main.handlebars file as the Default
 app.engine("handlebars", exphbs({defaultLayout: "main"}));
-app.set("view engline", "handlebars");
+app.set("view engine", "handlebars");
 
 // Routes
-require("./routes/api/routes.js")(app);
+//require("./routes/api/routes.js")(app);
 
+var routes = require("./routes/api/routes.js");
+
+app.use(routes);
 
 // Start the server
 app.listen(PORT, function() {

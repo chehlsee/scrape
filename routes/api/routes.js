@@ -1,56 +1,55 @@
 // need to set up router.get
 var router = require("express").Router();
-var connection = require("../");
+var axios = require("axios");
+var cheerio = require("cheerio");
+var db = require("../../models");
+// pull all of the articles thar are in the Article db and show on the main.handlebars 
 
-// Get all tables that aren't waiting
-router.get("/api/tables", function(req, res) {
-  connection.query("SELECT * FROM tables WHERE isWaiting = FALSE", function(err, dbTables) {
-    res.json(dbTables);
-  });
+router.get("/", function(req,res){
+  // read all articles from db
+  db
+    .Article
+    .find()
+    .then((dbArticles) => {
+      res.render("home", {articles: dbArticles});
+    })
+    .catch(err => {
+      console.log(err);
+      res.json(err);
+    })
+  
 });
+
+
 
 // routes
 
-// pull all of the articles thar are in the Article db and show on the main.handlebars 
-app.get("/", function(req,res){
-  db.Article.find({})
-  .then(dbArticle => {
-    var hbsObject = {
-      articles: dbArticle
-    };
-    console.log(hbsObject);
-    // everything from the Article goes onto the db on main.handlebars page for the clients to view
-    res.render("main", hbsObject);
-  })
-});
+
 
 // A GET route for scraping the vice website
 // the scrape route will bring back all of the articles that are on the vice home page and save them in the db and display them on the homepage (jQuery)
-app.get("/api/scrape", function(req, res) {
+router.get("/api/scrape", function(req, res) {
   // First, we grab the body of the html with axios
   axios.get("http://www.vice.com/").then(function(response) {
     // Then, we load that into cheerio and save it to $ for a shorthand selector
     var $ = cheerio.load(response.data);
 
     // Now, we grab every h2 within an article tag, and do the following:
-    $("h2").each(function(i, element) {
+    $(".grid__wrapper__card").each(function(i, element) {
       // Save an empty result object
       var result = {};
 
+      result.image = $(this).find("img").attr("src");
+
       // Add the text and href of every link, and save them as properties of the result object
-      result.title = $(this)
-        .children("a")
-        .text();
-      result.link = $(this)
-        .children("a")
-        .attr("href");
-      result.
+      result.title = $(this).find("h2.grid__wrapper__card__text__title").text();
+      result.link = $(this).attr('href');
 
       // Create a new Article using the `result` object built from scraping
       db.Article.create(result)
-        .then(function(dbArticle) {
+        .then(function(dbArticles) {
           // View the added result in the console
-          console.log(dbArticle);
+          console.log(dbArticles);
         })
         .catch(function(err) {
           // If an error occurred, log it
@@ -65,12 +64,12 @@ app.get("/api/scrape", function(req, res) {
 
 // Route for getting all Articles from the db
 // this route pulls all of the articles that have been scraped from the vice website and display them to the user on the homepage
-app.get("/api/articles", function(req, res) {
+router.get("/api/articles", function(req, res) {
   // Grab every document in the Articles collection
   db.Article.find({})
-    .then(function(dbArticle) {
+    .then(function(dbArticles) {
       // If we were able to successfully find Articles, send them back to the client
-      res.json(dbArticle);
+      res.json(dbArticles);
     })
     .catch(function(err) {
       // If an error occurred, send it to the client
@@ -80,14 +79,14 @@ app.get("/api/articles", function(req, res) {
 
 // Route for grabbing a specific Article by id, populate it with it's note
 // get single article with notes using populate
-app.get("/api/articles/:id", function(req, res) {
+router.get("/api/articles/:id", function(req, res) {
   // Using the id passed in the id parameter, prepare a query that finds the matching one in our db...
   db.Article.findOne({ _id: req.params.id })
     // ..and populate all of the notes associated with it
     .populate("note")
-    .then(function(dbArticle) {
+    .then(function(dbArticles) {
       // If we were able to successfully find an Article with the given id, send it back to the client
-      res.json(dbArticle);
+      res.json(dbArticles);
     })
     .catch(function(err) {
       // If an error occurred, send it to the client
@@ -96,7 +95,7 @@ app.get("/api/articles/:id", function(req, res) {
 });
 
 // route that will delete a note
-app.get("/api/delete", function(req,res) {
+router.get("/api/delete", function(req,res) {
   // delete Note
   db.Note.delete({})
   .then(function() {
@@ -109,7 +108,7 @@ app.get("/api/delete", function(req,res) {
 })
 
 // Route for saving/updating an Article's associated Note
-app.post("/api/articles/:id", function(req, res) {
+router.post("/api/articles/:id", function(req, res) {
   // Create a new note and pass the req.body to the entry
   db.Note.create(req.body)
     .then(function(dbNote) {
@@ -118,12 +117,14 @@ app.post("/api/articles/:id", function(req, res) {
       // Since our mongoose query returns a promise, we can chain another `.then` which receives the result of the query
       return db.Article.findOneAndUpdate({ _id: req.params.id }, { note: dbNote._id }, { new: true });
     })
-    .then(function(dbArticle) {
+    .then(function(dbArticles) {
       // If we were able to successfully update an Article, send it back to the client
-      res.json(dbArticle);
+      res.json(dbArticles);
     })
     .catch(function(err) {
       // If an error occurred, send it to the client
       res.json(err);
     });
 });
+
+module.exports = router;
