@@ -58,50 +58,55 @@
 </footer>
 
 <script type="text/javascript">
- $(".comment").on("click", function() {
-  // remove attribute from .save-note to ensure new one works
-  $(".save-note").attr("data-id", "");
+  $(".comment").on("click", function () {
+    // remove attribute from .save-note to ensure new one works
+    $(".save-note").attr("data-id", "");
 
-   // get article id out of button
-   const articleId = $(this).attr("data-id");
-   
-   // perform GET request to retrieve that single article's information
-   $.ajax({
-     url: "/api/articles/" + articleId,
-     method: "GET"
-   })
-   .then(articleInfo => {
-     console.log(articleInfo);
-     // print article title to comment section
-     $(".article-comment-header").text(articleInfo.title);
-     // add data attribute to save button to know which article note is being saved to
-     $(".save-note").attr("data-id", articleInfo._id);
-     // if there are notes, print them
-     if (articleInfo.note.length) {
-       articleInfo.note.forEach(note => {
-         $("<div>")
-          .append(`<h5>${note.title}</h5>`)
-          .append(`<p>${note.text}</p>`)
-          .appendTo($(".comment-list"));
-       })
-     }
-   })
- })
+    // get article id out of button
+    const articleId = $(this).attr("data-id");
 
- $('.save-note').on("click", function() {
-   // get article id for associated note
-   const articleId = $(this).attr("data-id");
+    // perform GET request to retrieve that single article's information
+    $.ajax({
+      url: "/api/articles/" + articleId,
+      method: "GET"
+    })
+      .then(articleInfo => {
+        console.log(articleInfo);
+        // print article title to comment section
+        $(".article-comment-header").text(articleInfo.title);
+        // add data attribute to save button to know which article note is being saved to
+        $(".save-note").attr("data-id", articleInfo._id);
+        // if there are notes, print them
+        if (articleInfo.note.length) {
+          articleInfo.note.forEach(note => {
+            $("<div>")
+              .append(`<h5>${note.title}</h5>`)
+              .append(`<p>${note.text}</p>`)
+              .appendTo($(".comment-list"));
+          })
+        }
+      })
+  })
 
-   if (!articleId) {
-     return false;
-   }
+  $('.save-note').on("click", function () {
+    // get article id for associated note
+    const articleId = $(this).attr("data-id");
 
-   const noteBody = {
-     title: $(".note-title").val(),
-     text: $(".note-text").val()
-   }
+    if (!articleId) {
+      return false;
+    }
 
-   // TODO: perform POST request to /api/articles/:id with noteBody used as req.body and articleId as req.params.id
- })
+    const noteBody = {
+      title: $(".note-title").val(),
+      text: $(".note-text").val()
+    }
+
+    // TODO: perform POST request to /api/articles/:id with noteBody used as req.body and articleId as req.params.id
+    $.ajax({
+      url: "/api/articles/:id" + articleId,
+      method: "POST"
+    }).then(noteBody);
+
+  });
 
 </script>
