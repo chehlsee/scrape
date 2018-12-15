@@ -101,12 +101,33 @@
       text: $(".note-text").val()
     }
 
-    // TODO: perform POST request to /api/articles/:id with noteBody used as req.body and articleId as req.params.id
-    $.ajax({
-      url: "/api/articles/:id" + articleId,
-      method: "POST"
-    }).then(noteBody);
 
+
+       // TODO: perform POST request to /api/articles/:id with noteBody used as req.body and articleId as req.params.id
+    // make the AJAX request to the API - POST the JSON data to the articleId that contains the note that was just posted
+    // the articleId data then gets passed as an argument to the noteBody function
+     // when user submits a note have an alert saying if the note was added or not added under the articleId
+     // this code isn't working
+     function postNote(noteBody) {
+       $.post ("/api/articles/${articleId}", {
+         _id: "",
+         title: title,
+         link: link,
+         author: author,
+         date: date,
+         subtext: subtext,
+         updated: updated
+       }).then(function(noteBody) {
+         window.location.replace(noteBody);
+          // if there's an error, handle it by throwing up a bootstrap alert
+       }).catch(Error);
+     }
+
+     function Error(err) {
+       $("#alert .msg").text
+       (err.responseJSON);
+       $("#alert").fadeIn(500);
+     }
   });
 
 </script>
