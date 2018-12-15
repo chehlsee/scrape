@@ -17,7 +17,8 @@ var cheerio = require("cheerio");
 // Require all models
 var db = require("./models");
 
-var PORT = 3000;
+// looks for process.env.PORT that heroku gives you and if they are giving you on open that if not open 3000 
+var PORT = process.env.PORT || 3000;
 
 // Initialize Express
 var app = express();
